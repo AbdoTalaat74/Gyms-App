@@ -12,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,8 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GymScreen(modifier: Modifier = Modifier) {
-    val vm:GymsViewModel = viewModel()
-
+    val vm: GymsViewModel = viewModel()
     Scaffold(modifier = modifier.fillMaxSize(), topBar = {
         TopAppBar(
             title = { Text(text = "Gyms App") },
@@ -38,10 +38,13 @@ fun GymScreen(modifier: Modifier = Modifier) {
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding()),
+                .padding(
+                    top = paddingValues.calculateTopPadding(),
+                    bottom = paddingValues.calculateBottomPadding()
+                ),
             contentPadding = PaddingValues(vertical = 4.dp)
         ) {
-            items(vm.state){gym ->
+            items(vm.state) { gym ->
                 GymItem(gym) {
                     vm.toggleFavoriteState(it)
 
