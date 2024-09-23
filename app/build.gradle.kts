@@ -70,7 +70,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation (libs.retrofit)
-    implementation(libs.converter.gson.v2110)
-    implementation (libs.converter.gson)
+    implementation(libs.androidx.navigation.compose) // Compose navigation
+
+
 
 }
