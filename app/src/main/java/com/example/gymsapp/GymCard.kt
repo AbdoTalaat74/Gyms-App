@@ -76,11 +76,8 @@ fun DefaultIcon(
 
 @Composable
 fun GymItem(gym:Gym,onClick:(Int)->Unit){
-    val isFavoriteState by remember {
-        mutableStateOf(false)
-    }
     val icon = if (gym.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder
-
+    gym.img = icon
     Card(
         modifier = Modifier
             .fillMaxWidth()

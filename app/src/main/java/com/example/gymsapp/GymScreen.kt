@@ -38,7 +38,7 @@ fun GymScreen(modifier: Modifier = Modifier) {
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding()),
+                .padding(top = paddingValues.calculateTopPadding(), bottom = paddingValues.calculateBottomPadding()),
             contentPadding = PaddingValues(vertical = 4.dp)
         ) {
             items(vm.state){gym ->

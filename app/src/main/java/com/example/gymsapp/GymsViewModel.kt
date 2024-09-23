@@ -3,17 +3,51 @@ package com.example.gymsapp
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class GymsViewModel(private val stateHandle: SavedStateHandle) : ViewModel() {
-    private fun getGyms() = lisOfGyms
+    var state by mutableStateOf(emptyList<Gym>())
+    private var apiService: GymApiService
+    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        throwable.printStackTrace()
+    }
 
+    init {
+        val retrofit: Retrofit = Retrofit.Builder()
+            .addConverterFactory(
+                GsonConverterFactory.create()
+            )
+            .baseUrl("https://cairo-gyms-b91c2-default-rtdb.firebaseio.com/")
+            .build()
+        apiService = retrofit.create(GymApiService::class.java)
+        getGyms()
+    }
 
-    var state by mutableStateOf(restoreSelectedGyms())
+    private fun getGyms() {
+        viewModelScope.launch(coroutineExceptionHandler) {
+            val gymsResponse = getGymsFromRemote()
+            if (gymsResponse.isSuccessful) {
+                state = gymsResponse.body()?.restoreSelectedGyms()!!
+            } else {
+                Log.e("GymsResponse", gymsResponse.message())
+            }
+
+        }
+    }
+
+    private suspend fun getGymsFromRemote() = withContext(Dispatchers.IO) { apiService.getGyms() }
+
     fun toggleFavoriteState(gymId: Int) {
         val gyms = state.toMutableList()
         val itemIndex = gyms.indexOfFirst { it.id == gymId }
@@ -22,28 +56,27 @@ class GymsViewModel(private val stateHandle: SavedStateHandle) : ViewModel() {
         state = gyms
     }
 
-    private fun storeSelectedGym(gym: Gym){
+    private fun storeSelectedGym(gym: Gym) {
         val savedHandleList = stateHandle.get<List<Int>?>(FAV_IDS).orEmpty().toMutableList()
         if (gym.isFavorite) savedHandleList.add(gym.id) else savedHandleList.remove(gym.id)
         stateHandle[FAV_IDS] = savedHandleList
-        Log.e("storedFavoriteGymsLog",savedHandleList.toString())
+        Log.e("storedFavoriteGymsLog", savedHandleList.toString())
 
     }
 
-    private fun restoreSelectedGyms():List<Gym>{
-        val gyms = getGyms()
-        stateHandle.get<List<Int>?>(FAV_IDS)?.let {savedIds->
-            savedIds.forEach{gymId ->
-                gyms.find { it.id == gymId }?.isFavorite =true
+    private fun List<Gym>.restoreSelectedGyms(): List<Gym> {
+        stateHandle.get<List<Int>?>(FAV_IDS)?.let { savedIds ->
+            savedIds.forEach { gymId ->
+                this.find { it.id == gymId }?.isFavorite = true
             }
 
 
         }
-        Log.e("favoriteGymsLog",gyms.toString())
-        return gyms
+        Log.e("favoriteGymsLog", this.toString())
+        return this
     }
 
-    companion object{
-       const val FAV_IDS = "favoriteGymsIDs"
+    companion object {
+        const val FAV_IDS = "favoriteGymsIDs"
     }
 }
