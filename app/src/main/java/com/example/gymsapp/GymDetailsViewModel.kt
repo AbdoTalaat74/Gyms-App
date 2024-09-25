@@ -12,14 +12,15 @@ import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class GymDetailsViewModel(savedStateHandle: SavedStateHandle) : ViewModel(){
+class GymDetailsViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
 
-    private var apiService:GymApiService
+    private var apiService: GymApiService
     var state = mutableStateOf<Gym?>(null)
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
     }
+
     init {
         val retrofit = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
@@ -27,24 +28,25 @@ class GymDetailsViewModel(savedStateHandle: SavedStateHandle) : ViewModel(){
             .build()
 
         apiService = retrofit.create(GymApiService::class.java)
-        val gymId = savedStateHandle.get<Int>("gym_id")?: 0
+        val gymId = savedStateHandle.get<Int>("gym_id") ?: 0
         getGym(gymId)
     }
 
 
-    private fun getGym(id:Int){
+    private fun getGym(id: Int) {
         viewModelScope.launch(coroutineExceptionHandler) {
             val response = getGymResponse(id)
-            if (response.isSuccessful){
+            if (response.isSuccessful) {
                 val gym = response.body()?.values?.first()
                 state.value = gym
-            }else{
-                Log.e("GymDetailsViewModelFailed",response.message())
+            } else {
+                Log.e("GymDetailsViewModelFailed", response.message())
             }
         }
     }
 
 
-    private suspend fun getGymResponse(id:Int) = withContext(Dispatchers.IO){apiService.getGym(id)}
+    private suspend fun getGymResponse(id: Int) =
+        withContext(Dispatchers.IO) { apiService.getGym(id) }
 
 }

@@ -22,6 +22,7 @@ class GymsViewModel(private val stateHandle: SavedStateHandle) : ViewModel() {
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
     }
+    private val gymsDao = GymsDatabase.getDaoInstance(GymsApplication.getApplicationContext())
 
     init {
         val retrofit: Retrofit = Retrofit.Builder()
@@ -37,16 +38,27 @@ class GymsViewModel(private val stateHandle: SavedStateHandle) : ViewModel() {
     private fun getGyms() {
         viewModelScope.launch(coroutineExceptionHandler) {
             val gymsResponse = getGymsFromRemote()
-            if (gymsResponse.isSuccessful) {
-                state = gymsResponse.body()?.restoreSelectedGyms()!!
-            } else {
-                Log.e("GymsResponse", gymsResponse.message())
-            }
+            state = gymsResponse.restoreSelectedGyms()
 
         }
     }
 
-    private suspend fun getGymsFromRemote() = withContext(Dispatchers.IO) { apiService.getGyms() }
+    private suspend fun getGymsFromRemote() = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.getGyms()
+            if (response.isSuccessful) {
+                response.body()?.let { gyms ->
+                    gymsDao.addAll(gyms)
+                    return@withContext gyms
+                }
+            }
+            Log.e("GymsViewModel", "Response is not successful or empty body")
+            return@withContext emptyList<Gym>()
+        } catch (e: Exception) {
+            Log.e("GymsViewModel", "Error fetching gyms", e)
+            return@withContext emptyList<Gym>()
+        }
+    }
 
     fun toggleFavoriteState(gymId: Int) {
         val gyms = state.toMutableList()
