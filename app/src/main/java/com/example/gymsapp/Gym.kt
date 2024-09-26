@@ -24,5 +24,5 @@ data class Gym(
     val isOpen: Boolean = false,
 
     @ColumnInfo(name = "is_favorite")
-    var isFavorite:Boolean = false
+    val isFavorite:Boolean = false
 )
