@@ -22,8 +22,8 @@ class GymsViewModel() : ViewModel() {
         throwable.printStackTrace()
         _state = _state.copy(isLoading = false, error = throwable.message)
     }
-    private val repo = GymsRepository()
-
+    private val getInitialGymsUseCase = GetInitialGymsUseCase()
+    private val toggleFavoriteStateUSeCase = ToggleFavoriteStateUSeCase()
     init {
 
         getGyms()
@@ -31,7 +31,7 @@ class GymsViewModel() : ViewModel() {
 
     private fun getGyms() {
         viewModelScope.launch(coroutineExceptionHandler) {
-            val receivedGyms = repo.getAllGyms()
+            val receivedGyms = getInitialGymsUseCase()
             _state = _state.copy(
                 gyms = receivedGyms,
                 isLoading = false
@@ -44,7 +44,7 @@ class GymsViewModel() : ViewModel() {
         val gyms = _state.gyms.toMutableList()
         val itemIndex = gyms.indexOfFirst { it.id == gymId }
         viewModelScope.launch {
-            val updatedGymsList = repo.toggleFavoriteGym(gymId, !gyms[itemIndex].isFavorite)
+            val updatedGymsList = toggleFavoriteStateUSeCase(gymId,gyms[itemIndex].isFavorite)
             _state = _state.copy(gyms = updatedGymsList)
         }
     }

@@ -18,17 +18,17 @@ class GymsRepository {
     private val gymsDao = GymsDatabase.getDaoInstance(GymsApplication.getApplicationContext())
 
 
-     suspend fun toggleFavoriteGym(gymId: Int, newFavoriteState: Boolean) =
+    suspend fun toggleFavoriteGym(gymId: Int, favoriteState: Boolean) =
         withContext(Dispatchers.IO) {
             gymsDao.update(
                 GymFavoriteState(
-                    id = gymId, isFavorite = newFavoriteState
+                    id = gymId, isFavorite = favoriteState
                 )
             )
             gymsDao.getAll()
         }
 
-     suspend fun getAllGyms() = withContext(Dispatchers.IO,) {
+    suspend fun loadGyms() = withContext(Dispatchers.IO) {
         try {
             updateLocalDatabase()
         } catch (e: Exception) {
@@ -36,11 +36,17 @@ class GymsRepository {
                 throw Exception("Something went wrong, no data was found, try connecting to Internet")
             }
         }
-        gymsDao.getAll()
+
+    }
+
+    suspend fun getGyms():List<Gym> {
+        return withContext(Dispatchers.IO){
+            return@withContext gymsDao.getAll()
+        }
     }
 
 
-     suspend fun updateLocalDatabase() {
+    private suspend fun updateLocalDatabase() {
         val gyms = apiService.getGyms()
         val favoriteGymsList = gymsDao.getFavoriteItems()
         gymsDao.addAll(gyms)
