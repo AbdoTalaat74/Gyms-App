@@ -1,4 +1,4 @@
-package com.example.gymsapp
+package com.example.gymsapp.gyms.presentation.details
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.gymsapp.composables.DefaultIcon
+import com.example.gymsapp.composables.GymDetails
 
 @Composable
 fun GymDetailsScreen(modifier: Modifier = Modifier) {

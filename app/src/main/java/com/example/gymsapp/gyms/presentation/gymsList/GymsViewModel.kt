@@ -1,4 +1,4 @@
-package com.example.gymsapp
+package com.example.gymsapp.gyms.presentation.gymsList
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
@@ -7,6 +7,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.gymsapp.gyms.domain.GetInitialGymsUseCase
+import com.example.gymsapp.gyms.domain.ToggleFavoriteStateUSeCase
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 
@@ -40,11 +42,9 @@ class GymsViewModel() : ViewModel() {
     }
 
 
-    fun toggleFavoriteState(gymId: Int) {
-        val gyms = _state.gyms.toMutableList()
-        val itemIndex = gyms.indexOfFirst { it.id == gymId }
+    fun toggleFavoriteState(gymId: Int,oldValue: Boolean) {
         viewModelScope.launch {
-            val updatedGymsList = toggleFavoriteStateUSeCase(gymId,gyms[itemIndex].isFavorite)
+            val updatedGymsList = toggleFavoriteStateUSeCase(gymId,oldValue)
             _state = _state.copy(gyms = updatedGymsList)
         }
     }

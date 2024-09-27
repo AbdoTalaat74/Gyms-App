@@ -1,5 +1,11 @@
-package com.example.gymsapp
+package com.example.gymsapp.gyms.data
 
+import com.example.gymsapp.GymsApplication
+import com.example.gymsapp.gyms.data.local.GymsDatabase
+import com.example.gymsapp.gyms.data.local.LocalGym
+import com.example.gymsapp.gyms.data.local.LocalGymFavoriteState
+import com.example.gymsapp.gyms.data.remote.GymApiService
+import com.example.gymsapp.gyms.domain.Gym
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
@@ -21,7 +27,7 @@ class GymsRepository {
     suspend fun toggleFavoriteGym(gymId: Int, favoriteState: Boolean) =
         withContext(Dispatchers.IO) {
             gymsDao.update(
-                GymFavoriteState(
+                LocalGymFavoriteState(
                     id = gymId, isFavorite = favoriteState
                 )
             )
@@ -41,7 +47,9 @@ class GymsRepository {
 
     suspend fun getGyms():List<Gym> {
         return withContext(Dispatchers.IO){
-            return@withContext gymsDao.getAll()
+            return@withContext gymsDao.getAll().map {
+                Gym(it.id,it.name,it.location,it.isOpen,it.isFavorite)
+            }
         }
     }
 
@@ -49,9 +57,11 @@ class GymsRepository {
     private suspend fun updateLocalDatabase() {
         val gyms = apiService.getGyms()
         val favoriteGymsList = gymsDao.getFavoriteItems()
-        gymsDao.addAll(gyms)
+        gymsDao.addAll(gyms.map {
+            LocalGym(it.id,it.name,it.location,it.isOpen)
+        })
         gymsDao.updateAll(
-            favoriteGymsList.map { GymFavoriteState(id = it.id, isFavorite = true) }
+            favoriteGymsList.map { LocalGymFavoriteState(id = it.id, isFavorite = true) }
         )
 
     }

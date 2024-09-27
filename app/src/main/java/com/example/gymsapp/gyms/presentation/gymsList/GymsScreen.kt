@@ -1,6 +1,5 @@
-package com.example.gymsapp
+package com.example.gymsapp.gyms.presentation.gymsList
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,12 +19,18 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.gymsapp.composables.GymItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GymsScreen(onItemClick: (id: Int) -> Unit) {
-    val vm: GymsViewModel = viewModel()
-    val state = vm.state.value
+fun GymsScreen(
+    state: GymsScreenState,
+    onFavoriteIconClick: (id: Int, oldValue: Boolean) -> Unit,
+    onItemClick: (
+        id: Int
+    ) -> Unit
+) {
+
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         TopAppBar(
             title = { Text(text = "Gyms App") },
@@ -50,7 +55,9 @@ fun GymsScreen(onItemClick: (id: Int) -> Unit) {
                 items(state.gyms) { gym ->
                     GymItem(
                         gym = gym,
-                        onFavoriteIconClick = { vm.toggleFavoriteState(it) },
+                        onFavoriteIconClick = { id, oldValue ->
+                            onFavoriteIconClick(id, oldValue)
+                        },
                         onItemClick = {
                             onItemClick(it)
                         }

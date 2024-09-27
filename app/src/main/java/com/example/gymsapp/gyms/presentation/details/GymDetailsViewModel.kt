@@ -1,16 +1,16 @@
-package com.example.gymsapp
+package com.example.gymsapp.gyms.presentation.details
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.gymsapp.GymsApplication
+import com.example.gymsapp.gyms.data.local.GymsDatabase
+import com.example.gymsapp.gyms.domain.Gym
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class GymDetailsViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
@@ -32,9 +32,15 @@ class GymDetailsViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private fun getGym(id: Int) {
         viewModelScope.launch(coroutineExceptionHandler) {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 val gym = gymsDao.getGym(id)
-                state.value = gym
+                state.value = Gym(
+                    gym.id,
+                    gym.name,
+                    gym.location,
+                    gym.isOpen,
+                    gym.isFavorite
+                )
             }
 
         }

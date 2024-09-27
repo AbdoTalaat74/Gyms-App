@@ -1,4 +1,4 @@
-package com.example.gymsapp
+package com.example.gymsapp.composables
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-
+import com.example.gymsapp.gyms.domain.Gym
 
 
 @Composable
@@ -68,7 +68,7 @@ fun DefaultIcon(
 
 
 @Composable
-fun GymItem(gym:Gym, onFavoriteIconClick:(Int)->Unit, onItemClick:(Int)->Unit){
+fun GymItem(gym: Gym, onFavoriteIconClick:(Int,Boolean)->Unit, onItemClick:(Int)->Unit){
     val icon = if (gym.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder
     Card(
         modifier = Modifier
@@ -102,7 +102,7 @@ fun GymItem(gym:Gym, onFavoriteIconClick:(Int)->Unit, onItemClick:(Int)->Unit){
                     .weight(0.15f)
                     .align(Alignment.CenterVertically)
             ) {
-                onFavoriteIconClick(gym.id)
+                onFavoriteIconClick(gym.id,gym.isFavorite)
             }
         }
     }

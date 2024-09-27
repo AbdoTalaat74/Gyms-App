@@ -1,4 +1,6 @@
-package com.example.gymsapp
+package com.example.gymsapp.gyms.domain
+
+import com.example.gymsapp.gyms.data.GymsRepository
 
 class GetInitialGymsUseCase {
     private val gymsRepository = GymsRepository()
