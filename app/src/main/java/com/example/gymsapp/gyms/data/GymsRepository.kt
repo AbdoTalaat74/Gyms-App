@@ -1,28 +1,20 @@
 package com.example.gymsapp.gyms.data
 
-import com.example.gymsapp.GymsApplication
-import com.example.gymsapp.gyms.data.local.GymsDatabase
+import com.example.gymsapp.gyms.data.local.GymsDAO
 import com.example.gymsapp.gyms.data.local.LocalGym
 import com.example.gymsapp.gyms.data.local.LocalGymFavoriteState
 import com.example.gymsapp.gyms.data.remote.GymApiService
 import com.example.gymsapp.gyms.domain.Gym
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class GymsRepository {
-
-    private val apiService = Retrofit.Builder()
-        .addConverterFactory(
-            GsonConverterFactory.create()
-        )
-        .baseUrl("https://cairo-gyms-b91c2-default-rtdb.firebaseio.com/")
-        .build()
-        .create(GymApiService::class.java)
-
-    private val gymsDao = GymsDatabase.getDaoInstance(GymsApplication.getApplicationContext())
-
+@Singleton
+class GymsRepository @Inject constructor(
+    private val apiService :GymApiService,
+    private val gymsDao:GymsDAO
+) {
 
     suspend fun toggleFavoriteGym(gymId: Int, favoriteState: Boolean) =
         withContext(Dispatchers.IO) {

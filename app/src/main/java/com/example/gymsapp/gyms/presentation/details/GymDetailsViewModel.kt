@@ -5,22 +5,27 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gymsapp.GymsApplication
+import com.example.gymsapp.gyms.data.local.GymsDAO
 import com.example.gymsapp.gyms.data.local.GymsDatabase
 import com.example.gymsapp.gyms.domain.Gym
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class GymDetailsViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
+@HiltViewModel
+class GymDetailsViewModel @Inject constructor(
+    private val gymsDao: GymsDAO,
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel() {
 
 
     var state = mutableStateOf<Gym?>(null)
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
     }
-
-    private val gymsDao = GymsDatabase.getDaoInstance(GymsApplication.getApplicationContext())
 
 
     init {

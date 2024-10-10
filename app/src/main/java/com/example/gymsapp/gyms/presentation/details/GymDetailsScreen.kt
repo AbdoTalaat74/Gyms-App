@@ -12,13 +12,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gymsapp.composables.DefaultIcon
 import com.example.gymsapp.composables.GymDetails
+import dagger.hilt.android.lifecycle.HiltViewModel
 
 @Composable
 fun GymDetailsScreen(modifier: Modifier = Modifier) {
-    val viewModel: GymDetailsViewModel = viewModel()
+    val viewModel: GymDetailsViewModel = hiltViewModel()
 
     val item = viewModel.state.value
 

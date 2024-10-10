@@ -9,10 +9,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gymsapp.gyms.domain.GetInitialGymsUseCase
 import com.example.gymsapp.gyms.domain.ToggleFavoriteStateUSeCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GymsViewModel() : ViewModel() {
+@HiltViewModel
+class GymsViewModel @Inject constructor(
+    private val getInitialGymsUseCase: GetInitialGymsUseCase,
+    private val toggleFavoriteStateUSeCase: ToggleFavoriteStateUSeCase
+
+) : ViewModel() {
     private var _state by mutableStateOf(
         GymsScreenState(
             gyms = emptyList(), isLoading = true
@@ -24,8 +31,7 @@ class GymsViewModel() : ViewModel() {
         throwable.printStackTrace()
         _state = _state.copy(isLoading = false, error = throwable.message)
     }
-    private val getInitialGymsUseCase = GetInitialGymsUseCase()
-    private val toggleFavoriteStateUSeCase = ToggleFavoriteStateUSeCase()
+
     init {
 
         getGyms()
@@ -42,9 +48,9 @@ class GymsViewModel() : ViewModel() {
     }
 
 
-    fun toggleFavoriteState(gymId: Int,oldValue: Boolean) {
+    fun toggleFavoriteState(gymId: Int, oldValue: Boolean) {
         viewModelScope.launch {
-            val updatedGymsList = toggleFavoriteStateUSeCase(gymId,oldValue)
+            val updatedGymsList = toggleFavoriteStateUSeCase(gymId, oldValue)
             _state = _state.copy(gyms = updatedGymsList)
         }
     }
